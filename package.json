@@ -1,0 +1,29 @@
+{
+	"name": "arma-config-parser",
+	"version": "1.0.0",
+	"description": "Convert ARMA cfgs into json and back",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"bugs": {
+		"url": "https://github.com/maca134/arma-config-parser/issues"
+	},
+	"homepage": "https://github.com/maca134/arma-config-parser",
+	"keywords": [
+		"sync"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/maca134/arma-config-parser.git"
+	},
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org/"
+	},
+	"author": {
+		"name": "Matthew McConnell",
+		"email": "maca134@googlemail.com",
+		"url": "https://github.com/maca134/arma-config-parser"
+	},
+	"license": "UNLICENSE"
+}
