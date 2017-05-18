@@ -1,6 +1,6 @@
 {
 	"name": "arma-config-parser",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Convert ARMA cfgs into json and back",
 	"main": "index.js",
 	"scripts": {
