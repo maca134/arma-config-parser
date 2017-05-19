@@ -1,5 +1,5 @@
 var util = require('util');
-
+var debug = true;
 function findNext(needle, haystack) {
 	var ptr = 0;
 	if (!Array.isArray(needle))
@@ -20,7 +20,9 @@ function toArmaExponential(v) {
 	return v;
 }
 
-module.exports.cfg2json = function cfg2json(input) {
+module.exports.cfg2json = function cfg2json(input, level) {
+	level = level || 0;
+	level += 1;
 	var ptr = 0;
 	var output = {};
 	while (ptr < input.length) {
@@ -28,15 +30,23 @@ module.exports.cfg2json = function cfg2json(input) {
 		if (eol === -1) break;
 		var line = input.slice(ptr, ptr + eol).trim();
 		if (classMatch = line.match(/^class\s+([a-z0-9]+)/i)) {
+			if (debug)
+				console.log('classMatch', classMatch[1], level);
 			ptr += findNext('{', input.slice(ptr)) + 1;
 			var innerStart = ptr;
 			var parenthesisCount = 1;
 			while (parenthesisCount > 0) {
 				var c = input[ptr];
+				if (!c) {
+					console.log('unexpected end of file - prob a bug when parsing the cfg');
+					process.exit();
+				}
 				if (c === '"' || c === '\'') {
-					ptr += 1;
-					var closeString = findNext(c, input.slice(ptr));
-					ptr += closeString + 1;
+					do {
+						ptr += 1;
+						ptr += findNext(c, input.slice(ptr)) ;
+					} while (input[ptr] === c);
+					continue;
 				} else if (c === '{') {
 					parenthesisCount += 1;
 				} else if (c === '}') {
@@ -45,13 +55,19 @@ module.exports.cfg2json = function cfg2json(input) {
 				ptr += 1;
 			};
 			var inner = input.slice(innerStart, ptr - 1).trim() + '\r\n';
-			output[classMatch[1]] = cfg2json(inner);
+			output[classMatch[1]] = cfg2json(inner, level);
 			eol = findNext(['\r', '\n'], input.slice(ptr));
 		} else if (varStringMatch = line.match(/^([a-z0-9]+)="(.+)";$/i)) {
+			if (debug)
+				console.log('varStringMatch', varStringMatch[1], level);
 			output[varStringMatch[1]] = varStringMatch[2];
 		} else if (varNumberMatch = line.match(/^([a-z0-9]+)=([0-9\.\-e]+);$/i)) {
+			if (debug)
+				console.log('varNumberMatch', varNumberMatch[1], level);
 			output[varNumberMatch[1]] = parseFloat(varNumberMatch[2]);
 		} else if (arrMatch = line.match(/^([a-z0-9]+)\[\]=/i)) {
+			if (debug)
+				console.log('arrMatch', arrMatch[1], level);
 			ptr += findNext('{', input.slice(ptr)) + 1;
 			var innerStart = ptr - 1;
 			var parenthesisCount = 1;
